@@ -1,10 +1,8 @@
 package y.w.twowayssl;
 
-import static java.util.Objects.nonNull;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
-import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,20 +12,16 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Optional;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManagerFactory;
 import lombok.RequiredArgsConstructor;
 import nl.altindag.ssl.SSLFactory;
-import nl.altindag.ssl.util.NettySslUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
@@ -39,7 +33,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.tcp.SslProvider.SslContextSpec;
 
 @RequiredArgsConstructor
 @SpringBootApplication
@@ -140,33 +133,32 @@ class HttpClientConfiguration {
      * @return
      * @throws SSLException
      */
-    @Bean(value = "httpClient1")
-    @Scope("prototype")
-    public HttpClient nettyHttpClient() throws SSLException {
-        SSLFactory sslFactory = sslFactory();
-
-        reactor.netty.http.client.HttpClient httpClient = HttpClient.create();
-        if (nonNull(sslFactory)) {
-            SslContext sslContext = NettySslUtils.forClient(sslFactory).build();
-            httpClient = httpClient.secure(sslSpec -> sslSpec.sslContext(sslContext));
-        }
-        return httpClient;
-    }
+//    @Bean
+//    @Scope("prototype")
+//    public HttpClient nettyHttpClient() throws SSLException {
+//        SSLFactory sslFactory = sslFactory();
+//
+//        reactor.netty.http.client.HttpClient httpClient = HttpClient.create();
+//        if (nonNull(sslFactory)) {
+//            SslContext sslContext = NettySslUtils.forClient(sslFactory).build();
+//            httpClient = httpClient.secure(sslSpec -> sslSpec.sslContext(sslContext));
+//        }
+//        return httpClient;
+//    }
 
     /**
      * Another way to create Netty Http Client
      *
      * @return
      */
-    @Bean(value = "httpClient2")
+    @Bean
     public HttpClient httpClient() {
         return HttpClient
             .create()
             .secure(spec -> {
                 try {
                     KeyStore keyStore = KeyStore.getInstance("JKS");
-                    keyStore.load(new FileInputStream(ResourceUtils.getFile(keyStorePath)),
-                        keyStorePassword);
+                    keyStore.load(new FileInputStream(ResourceUtils.getFile(keyStorePath)), keyStorePassword);
 
                     // Key Manager Factory to use this key store.
                     KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(
@@ -174,8 +166,7 @@ class HttpClientConfiguration {
                     keyManagerFactory.init(keyStore, keyStorePassword);
 
                     KeyStore trustStore = KeyStore.getInstance("JKS");
-                    trustStore.load(new FileInputStream(ResourceUtils.getFile(trustStorePath)),
-                        trustStorePassword);
+                    trustStore.load(new FileInputStream(ResourceUtils.getFile(trustStorePath)), trustStorePassword);
 
                     // Trust Manager Factory to use the trust store
                     TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
