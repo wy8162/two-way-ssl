@@ -1,0 +1,19 @@
+# Use curl:
+# The following will fail if there is no certificate.
+# curl -i -X GET https://localhost:8443/hello
+#
+# The following will succeed without certificate.
+# curl -i --insecure -X GET https://localhost:8443/hello
+GET https://localhost:8443/hello
+
+
+###
+GET https://localhost:8443/hello
+
+###
+
+
+GET http://localhost:8081/callApi
+Accept: application/json
+
+###

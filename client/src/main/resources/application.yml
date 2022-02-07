@@ -1,0 +1,28 @@
+# Application logging
+logging:
+  charset:
+    console: utf-8
+  level:
+    root: INFO
+    org:
+      springframework=INFO: INFO
+
+spring:
+  main:
+    banner-mode: console
+
+server:
+  port: 8081
+
+# One-Way SSL: client needs to validate and accept the server certificate.
+# Client ony needs trust store.
+# The following configurations are consumed by the WebClient.
+client:
+  ssl:
+    one-way-authentication-enabled: false
+    two-way-authentication-enabled: true # Will use both key store and trust store
+    key-store: classpath:certs/client_identity.jks
+    key-password: secret
+    key-store-password: secret
+    trust-store: classpath:certs/client_truststore.jks
+    trust-store-password: secret

@@ -1,0 +1,27 @@
+# Application logging
+logging:
+  charset:
+    console: utf-8
+  level:
+    root: INFO
+    org:
+      springframework=INFO: INFO
+
+spring:
+  main:
+    banner-mode: console
+
+# Add the JVM parameter for debug:
+# -Djavax.net.debug=SSL,keymanager,trustmanager,ssl:handshake
+#
+# "client-auth: need" requires the server to validate the identity of the client.
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:certs/server_identity.jks
+    key-password: secret
+    key-store-password: secret
+    trust-store: classpath:certs/server_truststore.jks
+    trust-store-password: secret
+    client-auth: need
